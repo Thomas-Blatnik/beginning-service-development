@@ -1,4 +1,5 @@
-﻿using Alba;
+﻿
+using Alba;
 using BusinessClockApi.Models;
 using BusinessClockApi.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,55 +9,24 @@ namespace BusinessClockApi.ContractTests.Status;
 
 public class StatusTests
 {
+
+
+
+    // TODO: This is what I wanted to do yesterday.
     [Fact]
-    public async Task WhileWeAreOpen()
+    public async Task WhileWeAreClosed2()
     {
+
         var host = await AlbaHost.For<Program>(config =>
         {
-            var clock = Substitute.For<ISystemTime>();
+            var time = Substitute.For<ISystemTime>();
+            var clock = Substitute.For<BusinessClock>(time);
 
-            clock.GetCurrent().Returns(new DateTime(2023, 8, 21, 16, 59, 00));
+            clock.IsOpen().Returns(false);
 
             config.ConfigureServices(services =>
             {
-                services.AddSingleton<ISystemTime>(clock);
-            });
-        });
-
-        var expectedResponse = new ClockResponseModel
-        {
-            IsOpen = true,
-            SupportContact = new SupportContactResponseModel
-            {
-                Name = "Mitch",
-                Phone = "800 555-1212",
-                Email = "mitch@company.com"
-            }
-        };
-
-        var response = await host.Scenario(api =>
-        {
-            api.Get.Url("/status");
-            api.StatusCodeShouldBeOk();
-        });
-
-        var responseMessage = response.ReadAsJson<ClockResponseModel>();
-
-        Assert.NotNull(responseMessage);
-        Assert.Equal(expectedResponse, responseMessage);
-    }
-
-    [Fact]
-    public async Task WhileWeAreClosed()
-    {
-        var host = await AlbaHost.For<Program>(config =>
-        {
-            var clock = Substitute.For<ISystemTime>();
-            clock.GetCurrent().Returns(new DateTime(2023, 8, 21, 17, 00, 00));
-
-            config.ConfigureServices(services =>
-            {
-                services.AddSingleton<ISystemTime>(clock);
+                services.AddSingleton<BusinessClock>(clock);
             });
         });
 
@@ -75,11 +45,54 @@ public class StatusTests
         {
             api.Get.Url("/status");
             api.StatusCodeShouldBeOk();
+
         });
 
         var responseMessage = response.ReadAsJson<ClockResponseModel>();
 
         Assert.NotNull(responseMessage);
+
+        Assert.Equal(expectedResponse, responseMessage);
+    }
+    [Fact]
+    public async Task WhileWeAreOpen2()
+    {
+
+        var host = await AlbaHost.For<Program>(config =>
+        {
+            var time = Substitute.For<ISystemTime>();
+            var clock = Substitute.For<BusinessClock>(time);
+
+            clock.IsOpen().Returns(true);
+
+            config.ConfigureServices(services =>
+            {
+                services.AddSingleton<BusinessClock>(clock);
+            });
+        });
+
+        var expectedResponse = new ClockResponseModel
+        {
+            IsOpen = true,
+            SupportContact = new SupportContactResponseModel
+            {
+                Name = "Mitch",
+                Phone = "800 555-1212",
+                Email = "mitch@company.com"
+            }
+        };
+
+        var response = await host.Scenario(api =>
+        {
+            api.Get.Url("/status");
+            api.StatusCodeShouldBeOk();
+
+        });
+
+        var responseMessage = response.ReadAsJson<ClockResponseModel>();
+
+        Assert.NotNull(responseMessage);
+
         Assert.Equal(expectedResponse, responseMessage);
     }
 }
