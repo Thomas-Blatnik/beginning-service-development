@@ -25,7 +25,7 @@ public class IssuesController : ControllerBase
     }
 
     [HttpGet("/issues")]
-    public async Task<ActionResult> GetIssues([FromQuery] string status = "All")
+    public async Task<ActionResult> GetIssues(CancellationToken ct, [FromQuery] string status = "All")
     {
         using var session = _documentStore.LightweightSession();
         IReadOnlyList<IssueResponse>? data = null;
@@ -38,7 +38,7 @@ public class IssuesController : ControllerBase
             IssueStatus statusEnum;
             if (Enum.TryParse<IssueStatus>(status, true, out statusEnum))
             {
-                data = await session.Query<IssueResponse>().Where(i => i.Status == statusEnum).ToListAsync();
+                data = await session.Query<IssueResponse>().Where(i => i.Status == statusEnum).ToListAsync(ct);
             }
             else
             {

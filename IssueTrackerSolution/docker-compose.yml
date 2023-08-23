@@ -9,6 +9,7 @@ services:
       - 5432:5432
     volumes:
       - ./sql/:/docker-entrypoint-initdb.d/
+      - db_data:/var/lib/postgresql/data
   business-clock-api:
     image: jeffrygonzalez/clock-api-bsd-aug-2023:latest
     ports:

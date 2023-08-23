@@ -10,7 +10,7 @@ GET http://localhost:1338/issues?status=Open
 
 ### Get just a single issue
 
-GET http://localhost:1338/issues/
+GET http://localhost:1338/issues/3c5cd70a-4aa8-4302-b922-1a8ebe595661
 
 ### Adding a new Issue
 
@@ -18,7 +18,7 @@ POST http://localhost:1338/issues
 Content-Type: application/json
 
 {
-  "description": "Stuff doesn't work",
-  "application": "The Angular Application",
-  "contactEmail": "jeff@aol.com"
+  "description": "The ship wrecked",
+  "application": "The Edmund Fitzgerald",
+  "contactEmail": "gordonlightfoot@aol.com"
 }
